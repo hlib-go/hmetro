@@ -77,13 +77,12 @@ func MonthlyTicketOpen(conf *Config, userId, productCode, outOrderNo string) (er
 // 计次票核销推送
 
 // Entry 计次票二维码H5页面嵌入
-func Entry(conf *Config, code, mobile string) (url string, err error) {
+func Entry(conf *Config, path, mobile string) (h5 string, err error) {
 	// AES加密
-	sign := mobile
-
-	url = conf.Qrpage
-	url = strings.ReplaceAll(url, "{code}", code)
-	url = strings.ReplaceAll(url, "{sign}", sign)
+	sign := AesEncryptCBC([]byte(mobile), []byte(conf.SecretAes))
+	h5 = conf.Qrpage
+	h5 = strings.ReplaceAll(h5, "{path}", url.QueryEscape(path))
+	h5 = strings.ReplaceAll(h5, "{sign}", url.QueryEscape(string(sign)))
 	return
 }
 

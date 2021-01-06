@@ -8,7 +8,8 @@ var cfg = &Config{
 	ServiceUrl: "https://itapdev-api.ucitymetro.com",
 	AppId:      "1609128932911",
 	Secret:     "1343410230280720384",
-	Qrpage:     "https://itapdev.ucitymetro.com/appentry?path=/eleTicket/qrpage/{code}&sign={sign}",
+	SecretAes:  "868971231616403394817a2360c4e8b2",
+	Qrpage:     "https://itapdev.ucitymetro.com/appentry?path={path}&sign={sign}",
 }
 
 func TestAuthByMobile(t *testing.T) {
@@ -23,7 +24,7 @@ func TestAuthByMobile(t *testing.T) {
 }
 
 func TestProductInfo(t *testing.T) {
-	prod, err := ProductInfo(cfg, "c003")
+	prod, err := ProductInfo(cfg, "d001")
 	if err != nil {
 		t.Error(err)
 		return
@@ -34,7 +35,7 @@ func TestProductInfo(t *testing.T) {
 }
 
 func TestMonthlyTicketOpen(t *testing.T) {
-	err := MonthlyTicketOpen(cfg, "b89b4187202240b7a49007901305a17b", "c003", Rand32())
+	err := MonthlyTicketOpen(cfg, "b89b4187202240b7a49007901305a17b", "d001", Rand32())
 	if err != nil {
 		t.Error(err)
 		return
@@ -47,7 +48,8 @@ func TestMonthlyTicketOpen(t *testing.T) {
 
 //计次票二维码H5页面嵌入
 func TestEntry(t *testing.T) {
-	url, err := Entry(cfg, "c23423", "b89b4187202240b7a49007901305a17b")
+	path := "/eleTicket/qrpage/1346708681668038656"
+	url, err := Entry(cfg, path, "13611703040")
 	if err != nil {
 		t.Error(err)
 		return

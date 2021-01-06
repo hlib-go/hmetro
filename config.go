@@ -15,5 +15,6 @@ type Config struct {
 	ServiceUrl string `json:"serviceUrl"`
 	AppId      string `json:"appId"`
 	Secret     string `json:"secret"`
+	SecretAes  string `json:"secretAes"`
 	Qrpage     string `json:"qrpage"` // 计次票二维码H5页面，参数 {code} 二维码地址  {sign} 手机号加密字符串  示例：https://itapdev.ucitymetro.com/appentry?path=/eleTicket/qrpage/1325725767652478976&sign=手机号加密字符串
 }
