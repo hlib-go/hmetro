@@ -2,6 +2,7 @@ package hmetro
 
 import (
 	"crypto/md5"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -77,12 +78,16 @@ func MonthlyTicketOpen(conf *Config, userId, productCode, outOrderNo string) (er
 // 计次票核销推送
 
 // Entry 计次票二维码H5页面嵌入
-func Entry(conf *Config, path, mobile string) (h5 string, err error) {
+func Entry(conf *Config, code, mobile string) (h5 string, err error) {
+	path := strings.ReplaceAll(conf.Path, "{code}", code)
+
 	// AES加密
-	sign := AesEncryptCBC([]byte(mobile), []byte(conf.SecretAes))
+	sign := base64.StdEncoding.EncodeToString(AesEncryptECB([]byte(mobile), []byte(conf.SecretAes)))
+	logrus.Info("conf.SecretAes=", conf.SecretAes, " mobile=", mobile, " sign=", sign)
 	h5 = conf.Qrpage
 	h5 = strings.ReplaceAll(h5, "{path}", url.QueryEscape(path))
-	h5 = strings.ReplaceAll(h5, "{sign}", url.QueryEscape(string(sign)))
+	h5 = strings.ReplaceAll(h5, "{sign}", url.QueryEscape(sign))
+	h5 = strings.ReplaceAll(h5, "{appId}", conf.AppId)
 	return
 }
 

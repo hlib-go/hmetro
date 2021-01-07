@@ -161,26 +161,6 @@ func TestAesEncryptECB(t *testing.T) {
 	}
 }
 
-func Test_generateKey(t *testing.T) {
-	type args struct {
-		key []byte
-	}
-	tests := []struct {
-		name       string
-		args       args
-		wantGenKey []byte
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if gotGenKey := generateKey(tt.args.key); !reflect.DeepEqual(gotGenKey, tt.wantGenKey) {
-				t.Errorf("generateKey() = %v, want %v", gotGenKey, tt.wantGenKey)
-			}
-		})
-	}
-}
-
 func Test_pkcs5Padding(t *testing.T) {
 	type args struct {
 		ciphertext []byte

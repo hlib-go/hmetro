@@ -42,7 +42,8 @@ func pkcs5UnPadding(origData []byte) []byte {
 
 // =================== ECB ======================
 func AesEncryptECB(origData []byte, key []byte) (encrypted []byte) {
-	cipher, _ := aes.NewCipher(generateKey(key))
+	// key长度只能32位
+	cipher, _ := aes.NewCipher(generateKey(key, 32))
 	length := (len(origData) + aes.BlockSize) / aes.BlockSize
 	plain := make([]byte, length*aes.BlockSize)
 	copy(plain, origData)
@@ -55,11 +56,10 @@ func AesEncryptECB(origData []byte, key []byte) (encrypted []byte) {
 	for bs, be := 0, cipher.BlockSize(); bs <= len(origData); bs, be = bs+cipher.BlockSize(), be+cipher.BlockSize() {
 		cipher.Encrypt(encrypted[bs:be], plain[bs:be])
 	}
-
 	return encrypted
 }
 func AesDecryptECB(encrypted []byte, key []byte) (decrypted []byte) {
-	cipher, _ := aes.NewCipher(generateKey(key))
+	cipher, _ := aes.NewCipher(generateKey(key, 32))
 	decrypted = make([]byte, len(encrypted))
 	//
 	for bs, be := 0, cipher.BlockSize(); bs < len(encrypted); bs, be = bs+cipher.BlockSize(), be+cipher.BlockSize() {
@@ -70,14 +70,13 @@ func AesDecryptECB(encrypted []byte, key []byte) (decrypted []byte) {
 	if len(decrypted) > 0 {
 		trim = len(decrypted) - int(decrypted[len(decrypted)-1])
 	}
-
 	return decrypted[:trim]
 }
-func generateKey(key []byte) (genKey []byte) {
-	genKey = make([]byte, 16)
+func generateKey(key []byte, klen int) (genKey []byte) {
+	genKey = make([]byte, klen)
 	copy(genKey, key)
-	for i := 16; i < len(key); {
-		for j := 0; j < 16 && i < len(key); j, i = j+1, i+1 {
+	for i := klen; i < len(key); {
+		for j := 0; j < klen && i < len(key); j, i = j+1, i+1 {
 			genKey[j] ^= key[i]
 		}
 	}

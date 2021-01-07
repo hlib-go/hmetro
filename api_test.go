@@ -9,7 +9,8 @@ var cfg = &Config{
 	AppId:      "1609128932911",
 	Secret:     "1343410230280720384",
 	SecretAes:  "868971231616403394817a2360c4e8b2",
-	Qrpage:     "https://itapdev.ucitymetro.com/appentry?path={path}&sign={sign}",
+	Qrpage:     "https://itapdev.ucitymetro.com/appentry?path={path}&sign={sign}&appId={appId}",
+	Path:       "/ticket/qrcode-nbhy/{code}",
 }
 
 func TestAuthByMobile(t *testing.T) {
@@ -47,9 +48,24 @@ func TestMonthlyTicketOpen(t *testing.T) {
 // 月票核销推送 ,通知请求URL什么时候配置
 
 //计次票二维码H5页面嵌入
-func TestEntry(t *testing.T) {
-	path := "/eleTicket/qrpage/1346708681668038656"
-	url, err := Entry(cfg, path, "13611703040")
+func TestEntry1(t *testing.T) {
+	url, err := Entry(cfg, "1346708681668038656", "13611703040")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(url)
+	// 测试结果：
+}
+
+/*
+试一下AES/ECB/PKCS5Padding呢，他工具包的注解可能写错了
+我这边的加密结果：
+手机号：13611703040
+加密结果：zyqoA9pCuwJyfaCQWwtoTw==
+*/
+func TestEntry2(t *testing.T) {
+	url, err := Entry(cfg, "1347006618226790400", "13611703040")
 	if err != nil {
 		t.Error(err)
 		return
