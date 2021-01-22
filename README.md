@@ -25,3 +25,11 @@ appId：1609128932911  产品编号： c003
 4. 计次票推送需要产品实验室测试阶段才能联调
 5. 测试AES密钥：868971231616403394817a2360c4e8b2
 ```
+
+20210107 测试成功。 H5页面：https://itapdev.ucitymetro.com/appentry?path=%2Fticket%2Fqrcode-nbhy%2F1347006618226790400&sign=zyqoA9pCuwJyfaCQWwtoTw%3D%3D&appId=1609128932911
+
+
+
+
+
+  
