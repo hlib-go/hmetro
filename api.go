@@ -55,37 +55,53 @@ func ProductInfo(conf *Config, productCode string) (prodInfo *ProdInfo, err erro
 }
 
 type ProdInfo struct {
-	Times      int64     `json:"times"`      //可乘车次数
-	ValidType  int64     `json:"validType"`  //有效期类型(0绝对，1相对)
-	ValidStart time.Time `json:"validStart"` //绝对有效期-开始
-	ValidEnd   time.Time `json:"validEnd"`   //绝对有效期-结束
-	Duration   int64     `json:"duration"`   //相对有效期（天）
+	AvailableTimes int64     `json:"availableTimes"` //可乘车次数
+	ValidType      int64     `json:"validType"`      //有效期类型(0绝对，1相对)
+	ValidStart     time.Time `json:"validStart"`     //绝对有效期-开始
+	ValidEnd       time.Time `json:"validEnd"`       //绝对有效期-结束
+	Duration       int64     `json:"duration"`       //相对有效期（天）
+	SaleStatus     int64     `json:"saleStatus"`
+	LimitBuyNumber int64     `json:"limitBuyNumber"`
 }
 
 // MonthlyTicketOpen 计次票开通接口
-func MonthlyTicketOpen(conf *Config, userId, productCode, outOrderNo string) (err error) {
+func MonthlyTicketOpen(conf *Config, userId, productCode, outOrderNo string) (data *TicketData, err error) {
 	bm := make(map[string]string)
 	bm["userId"] = userId
 	bm["productCode"] = productCode
 	bm["outOrderNo"] = outOrderNo
-	_, err = Request(conf, "/public/monthlyticket/open", APPLICATION_JSON, METHOD_POST, bm)
+	dbytes, err := Request(conf, "/public/monthlyticket/open", APPLICATION_JSON, METHOD_POST, bm)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(dbytes, &data)
 	if err != nil {
 		return
 	}
 	return
 }
 
+type TicketData struct {
+	OrderNo     string               `json:"orderNo"` //票务扩展平台订单编号
+	TicketCodes []string             `json:"ticketCodes"`
+	Tickets     []*TicketDataTickets `json:"tickets"`
+}
+type TicketDataTickets struct {
+	TicketCode      string `json:"ticketCode"`      //月票编号
+	TicketTimes     int    `json:"ticketTimes"`     //月票次数
+	TicketStartTime string `json:"ticketStartTime"` //月票有效起始时间，yyyy-MM-ddHH:mm:ss
+	TicketEndTime   string `json:"ticketEndTime"`   //月票有效截止时间，yyyy-MM-ddHH:mm:ss
+}
+
 // 计次票核销推送
 
 // Entry 计次票二维码H5页面嵌入
 func Entry(conf *Config, code, mobile string) (h5 string, err error) {
-	path := strings.ReplaceAll(conf.Path, "{code}", code)
-
 	// AES加密
 	sign := base64.StdEncoding.EncodeToString(AesEncryptECB([]byte(mobile), []byte(conf.SecretAes)))
 	logrus.Info("conf.SecretAes=", conf.SecretAes, " mobile=", mobile, " sign=", sign)
-	h5 = conf.Qrpage
-	h5 = strings.ReplaceAll(h5, "{path}", url.QueryEscape(path))
+	h5 = conf.QrCode
+	h5 = strings.ReplaceAll(h5, "{code}", code)
 	h5 = strings.ReplaceAll(h5, "{sign}", url.QueryEscape(sign))
 	h5 = strings.ReplaceAll(h5, "{appId}", conf.AppId)
 	return
@@ -128,7 +144,7 @@ func Sign(conf *Config, bm map[string]string) string {
 
 // 表单Post请求
 func Request(conf *Config, path string, contentType, method string, bm map[string]string) (data []byte, err error) {
-	flog := logrus.WithField("ch", "hmetro").WithField("requestId", Rand32())
+	flog := logrus.WithField("requestId", Rand32())
 	surl := conf.ServiceUrl + path
 
 	bm["appId"] = conf.AppId
