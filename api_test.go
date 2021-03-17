@@ -37,7 +37,7 @@ func TestProductInfo(t *testing.T) {
 }
 
 func TestMonthlyTicketOpen(t *testing.T) {
-	_, err := MonthlyTicketOpen(cfg, "b89b4187202240b7a49007901305a17b", "d001", Rand32())
+	_, err := MonthlyTicketOpen(cfg, "04ec8c727c244d3094cb0ffc792e77ba", "d001", Rand32())
 	if err != nil {
 		t.Error(err)
 		return
